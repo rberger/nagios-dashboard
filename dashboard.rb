@@ -135,7 +135,9 @@ EventMachine.run do
     end
   end
 
-  EMDirWatcher.watch File.dirname(File.expand_path(OPTIONS.config[:datfile])), :include_only => ['status.dat'], :grace_period => 0.5 do
+  w = FileWatch::Watch.new
+  w.watch(File.dirname(File.expand_path(OPTIONS.config[:datfile])), :create)
+  w.subscribe do |event|
     unless websocket_connections.count == 0
       EventMachine.defer(nagios_status, update_clients)
     end
